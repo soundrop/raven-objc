@@ -22,7 +22,7 @@ typedef enum {
 @interface RavenClient : NSObject <NSURLConnectionDelegate>
 
 // Singleton and initializers
-+ (RavenClient *)clientWithDSN:(NSString *)DSN;
++ (RavenClient *)clientWithDSN:(NSString *)DSN tags:(NSDictionary*)tags;
 + (RavenClient *)sharedClient;
 
 - (id)initWithDSN:(NSString *)DSN;

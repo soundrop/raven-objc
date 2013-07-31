@@ -48,8 +48,8 @@ void exceptionHandler(NSException *exception) {
 
 #pragma mark - Singleton and initializers
 
-+ (RavenClient *)clientWithDSN:(NSString *)DSN {
-    RavenClient *client = [[self alloc] initWithDSN:DSN];
++ (RavenClient *)clientWithDSN:(NSString *)DSN tags:(NSDictionary*)tags{
+    RavenClient *client = [[self alloc] initWithDSN:DSN tags:tags];
     return client;
 }
 
@@ -57,11 +57,12 @@ void exceptionHandler(NSException *exception) {
     return sharedClient;
 }
 
-- (id)initWithDSN:(NSString *)DSN {
+- (id)initWithDSN:(NSString *)DSN tags:(NSDictionary*)tags {
     self = [super init];
     if (self) {
         // TODO: figure out how instance construction works
         self.config = [RavenConfig alloc];
+        self.tags = tags;
         
         // Parse DSN
         if (![self.config setDSN:DSN]) {
@@ -102,6 +103,10 @@ void exceptionHandler(NSException *exception) {
     if (file) {
         [data setObject:[[NSString stringWithUTF8String:file] lastPathComponent] forKey:@"culprit"];
     }
+    
+    if (self.tags) {
+        [data setObject:self.tags forKey:@"tags"];
+    }
 
     if (method && file && line) {
         NSDictionary *frame = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -137,6 +142,10 @@ void exceptionHandler(NSException *exception) {
                                  kRavenLogLevelArray[kRavenLogLevelDebugFatal], @"level",
                                  @"objc", @"platform",
                                  nil];
+    
+    if (self.tags) {
+        [data setObject:self.tags forKey:@"tags"];
+    }
 
     NSDictionary *exceptionDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                    exception.name, @"type",
